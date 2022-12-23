@@ -80,15 +80,18 @@ vector<string> split(const string &str, char delimiter)
  */
 void order(vector<Person> &rankedPeople, vector<Person> &unrankedPeople, vector<int> places)
 {
+  // Shuffles the available indexes
   srand(time(0));
   random_shuffle(places.begin(), places.end());
 
+  // Assigning indexes and adding unranked persons to the ranked vector
   for (int i = 0; i < unrankedPeople.size(); i++)
   {
     unrankedPeople[i].setIndex(places[i]);
     rankedPeople.push_back(unrankedPeople[i]);
   }
 
+  // Sorting based on the index
   sort(rankedPeople.begin(), rankedPeople.end(), [](Person &p1, Person &p2) -> bool
        { return p1.getIndex() < p2.getIndex(); });
 }
