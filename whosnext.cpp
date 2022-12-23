@@ -1,35 +1,18 @@
-#include <stdio.h>
+#include <iostream>
 #include <vector>
+#include <fstream>
 #include <sstream>
 #include <algorithm>
 
-#include "Person.class.hpp"
+#include "class/Person.class.hpp"
+
+#define print(s) (cout << s)
 
 using namespace std;
 
-int *genIntArrayFromSize(int size)
+bool contains(vector<int> arr, int value)
 {
-  int *count = new int[size];
-  for (int i = 0; i < size; i++)
-  {
-    count[i] = i;
-  }
-  return count;
-}
-
-int *genIntArrayFromPersonsIndex(vector<Person> &persons)
-{
-  int *count = new int[persons.size()];
-  for (int i = 0; i < persons.size(); i++)
-  {
-    count[i] = persons[i].getIndex();
-  }
-  return count;
-}
-
-bool contains(int *arr, int value)
-{
-  for (int i = 0; i < sizeof(arr); i++)
+  for (int i = 0; i < arr.size(); i++)
   {
     if (arr[i] == value)
     {
@@ -39,11 +22,11 @@ bool contains(int *arr, int value)
   return false;
 }
 
-vector<int> indexDiff(int *a, int *b)
+vector<int> indexDiff(vector<int> a, vector<int> b)
 {
   vector<int> diff;
 
-  for (int i = 0; i < sizeof(a); i++)
+  for (int i = 0; i < a.size(); i++)
   {
     if (!contains(b, a[i]))
     {
@@ -66,57 +49,62 @@ vector<string> split(const string &str, char delimiter)
   return tokens;
 }
 
-void readLines(const char *filename, vector<string> &names, vector<int> &indexes)
+void order(vector<Person> &rankedPeople, vector<Person> &unrankedPeople, vector<int> places)
 {
-  names.clear();
-  stringstream file(filename);
+  srand(time(0));
+  random_shuffle(places.begin(), places.end());
+
+  for (int i = 0; i < unrankedPeople.size(); i++)
+  {
+    unrankedPeople[i].setIndex(places[i]);
+    rankedPeople.push_back(unrankedPeople[i]);
+  }
+
+  sort(rankedPeople.begin(), rankedPeople.end(), [](Person &p1, Person &p2) -> bool
+       { return p1.getIndex() < p2.getIndex(); });
+}
+
+void readLines(const char *filename)
+{
+  ifstream file(filename);
 
   vector<Person> ranked, unranked;
+  vector<int> indexes, usedIndexes;
+
+  int i = 0;
   string s;
   while (getline(file, s))
   {
 
+    Person p;
     if (s.find(',') != string::npos)
     {
       vector<string> splitLine = split(s, ',');
-      string name = splitLine[0];
-      unsigned short int index = stoi(splitLine[1]);
-      Person rankedPerson(name, index);
+      int index = stoi(splitLine[0]);
+      p.setName(splitLine[1]);
+      p.setIndex(index);
 
-      ranked.push_back(rankedPerson);
+      ranked.push_back(p);
+      usedIndexes.push_back(index);
     }
     else
     {
-      Person unrankedPerson(s);
-      unranked.push_back(unrankedPerson);
+      p.setName(s);
+      unranked.push_back(p);
     }
+    indexes.push_back(i);
+    i++;
   }
 
-  int *totalIndexes = genIntArrayFromSize(ranked.size() + unranked.size());
-  int *rankedIndexes = genIntArrayFromPersonsIndex(ranked);
-  vector<int> unrankedIndexes = indexDiff(totalIndexes, rankedIndexes);
-  random_shuffle(unrankedIndexes.begin(), unrankedIndexes.end());
-
-  for (int i = 0; i < unranked.size(); i++)
+  order(ranked, unranked, indexDiff(indexes, usedIndexes));
+  for (Person p : ranked)
   {
-    unranked[i].setIndex(unrankedIndexes[i]);
-    ranked.push_back(unranked[i]);
-  }
-
-  sort(ranked.begin(), ranked.end(), [](Person &p1, Person &p2) -> bool
-       { return p1.getIndex() > p2.getIndex(); });
-
-  for (int i = 0; i < ranked.size(); i++)
-  {
-    string line = "\n" + (i + 1) + ranked[i].getName();
-    printf(line.c_str());
+    print(p.getIndex() + 1 << ": " << p.getName() << "\n");
   }
 }
 
-int main()
+int main(int argc, char *argv[])
 {
-  const char *filename = "./src/names.txt";
-  vector<string> names;
-  vector<int> indexes;
-  readLines(filename, names, indexes);
+  const char *filename = argv[1];
+  readLines(filename);
 }
