@@ -1,5 +1,8 @@
 #include <iostream>
 
+#ifndef PERSON_H
+#define PERSON_H
+
 using namespace std;
 
 class Person
@@ -19,3 +22,5 @@ public:
   void setName(string n);
   void setIndex(int i);
 };
+
+#endif

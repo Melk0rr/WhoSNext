@@ -20,7 +20,7 @@ using namespace std;
  */
 bool contains(vector<int> arr, int value)
 {
-  for (int i = 0; i < arr.size(); i++)
+  for (unsigned int i = 0; i < arr.size(); i++)
   {
     if (arr[i] == value)
     {
@@ -41,7 +41,7 @@ vector<int> indexDiff(vector<int> a, vector<int> b)
 {
   vector<int> diff;
 
-  for (int i = 0; i < a.size(); i++)
+  for (unsigned int i = 0; i < a.size(); i++)
   {
     if (!contains(b, a[i]))
     {
@@ -85,7 +85,7 @@ void order(vector<Person> &rankedPeople, vector<Person> &unrankedPeople, vector<
   random_shuffle(places.begin(), places.end());
 
   // Assigning indexes and adding unranked persons to the ranked vector
-  for (int i = 0; i < unrankedPeople.size(); i++)
+  for (unsigned int i = 0; i < unrankedPeople.size(); i++)
   {
     unrankedPeople[i].setIndex(places[i]);
     rankedPeople.push_back(unrankedPeople[i]);
@@ -152,7 +152,7 @@ void readLines(const char *filename)
  * @param argv function arguments
  * @return int
  */
-int main(int argc, char *argv[])
+int main(int, char *argv[])
 {
   const char *filename = argv[1];
   readLines(filename);
